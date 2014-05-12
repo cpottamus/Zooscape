@@ -6,11 +6,11 @@
 
 #pragma once
 
-extern Sifteo::AssetGroup IconAssets;
-extern const Sifteo::AssetImage Icon;
 extern Sifteo::AssetGroup BootstrapAssets;
 extern const Sifteo::PinnedAssetImage BlackTile;
 extern const Sifteo::AssetImage Backgrounds;
+extern Sifteo::AssetGroup IconAssets;
+extern const Sifteo::AssetImage Icon;
 extern const Sifteo::AssetAudio SfxAttach;
 extern const Sifteo::AssetAudio SfxDetach;
 extern const Sifteo::AssetAudio SfxConnect;
