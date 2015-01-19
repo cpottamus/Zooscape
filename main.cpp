@@ -254,9 +254,9 @@ static void onNeighborRemove(void* ctxt, unsigned cube0, unsigned side0, unsigne
     } else if (currentLearningTask==3){
         lt3SideCheck(cube0, cube1);
     } else if (currentLearningTask==4){
-        
+        lt4SideCheck(cube0, cube1);
     } else if (currentLearningTask==5){
-        
+        lt5SideCheck(cube0, cube1);
     } else {
         //Error Case
         Sifteo::System::exit();
@@ -626,6 +626,53 @@ static void lt3SideCheck(unsigned cube0, unsigned cube1){
     int c0 = int(cube0);
     int c1 = int(cube1);
 
+    if(c0 != chamInt && c1 != chamInt) {
+        //Log Flower touch action here (maybe make them wiggle?)
+    } else {
+
+        Neighborhood nb(chameleon);
+
+        int bCham = int((nb.neighborAt(BOTTOM)));
+        int lCham = int((nb.neighborAt(LEFT)));
+        int rCham = int((nb.neighborAt(RIGHT)));
+        int tCham = int((nb.neighborAt(TOP)));
+
+        //If chameleon is green
+        if(chamColor == 0) {
+
+            if(((bCham == yellInt) || (lCham == yellInt) || (rCham == yellInt) || (tCham == yellInt)) && 
+                (bCham != purpInt) && (lCham != purpInt) && (rCham != purpInt) && (tCham != purpInt) ) {
+                //right
+                chamColor = 1;
+                currentBackgrounds[0] = 20;
+
+            } else if(nb.hasNeighborAt(BOTTOM) || nb.hasNeighborAt(TOP) || nb.hasNeighborAt(LEFT) || nb.hasNeighborAt(RIGHT)){
+                //wrong
+                currentBackgrounds[0] = 19;
+            } else {
+                //idle
+                currentBackgrounds[0]= 16;
+            }
+
+        }  
+        //if chameleon is yellow 
+        else if(chamColor == 1){
+            if(((bCham == purpInt) || (lCham == purpInt) || (rCham == purpInt) || (tCham == purpInt)) && 
+                (bCham != yellInt) && (lCham != yellInt) && (rCham != yellInt) && (tCham != yellInt) ) {
+                //right
+                chamColor = 1;
+                currentBackgrounds[0] = 22;
+
+            } else if(nb.hasNeighborAt(BOTTOM) || nb.hasNeighborAt(TOP) || nb.hasNeighborAt(LEFT) || nb.hasNeighborAt(RIGHT)){
+                //wrong
+                currentBackgrounds[0] = 21;
+            } else {
+                //idle
+                currentBackgrounds[0]= 20;
+            }
+        }
+    }
+
 
 
 
@@ -660,6 +707,8 @@ static void learningTask4(){
 
         trampoline = cbs[2];
         currentBackgrounds[2] = 30;
+
+        chamColor = 0;
     } //Add further conditionals to reinforce negative feedback
     //else if (monkey touching giraffe not on top)
         //Then animate monkey and giraffe negatively
@@ -691,8 +740,8 @@ static void lt4SideCheck(unsigned cube0, unsigned cube1){
         int topPenguin = int((nb1.neighborAt(TOP)));
 
         if (rightPenguin == ice1Int && !nb1.hasNeighborAt(BOTTOM) && !nb1.hasNeighborAt(LEFT) && !nb1.hasNeighborAt(TOP)) {
+            
             //right Penguin
-
             currentBackgrounds[0] = 34;
 
             //audio: correct connection reinforcement.
@@ -718,8 +767,8 @@ static void lt4SideCheck(unsigned cube0, unsigned cube1){
         int rIce1 = int((nb2.neighborAt(RIGHT)));
         int tIce1 = int((nb2.neighborAt(TOP)));
 
-        if(((lIce1 == pengInt) && (nb2.hasNeighborAt(BOTTOM) && !nb2.hasNeighborAt(RIGHT) && !nb2.hasNeighborAt(TOP))) ||
-            ((rIce1 == ice2Int) && (nb2.hasNeighborAt(BOTTOM) && !nb2.hasNeighborAt(LEFT) && !nb2.hasNeighborAt(TOP)))) {
+        if(((lIce1 == pengInt) && (!nb2.hasNeighborAt(BOTTOM) && !nb2.hasNeighborAt(RIGHT) && !nb2.hasNeighborAt(TOP))) ||
+            ((rIce1 == ice2Int) && (!nb2.hasNeighborAt(BOTTOM) && !nb2.hasNeighborAt(LEFT) && !nb2.hasNeighborAt(TOP)))) {
             //Right Ice1
             LOG("CORRECT ICE1 CONNECTION");
             // currentBackgrounds[1] = --;
@@ -766,8 +815,10 @@ static void lt4SideCheck(unsigned cube0, unsigned cube1){
 
 static void learningTask5(){
 
-    //if monkey on giraffe & touching toucan
-    if(false)
+    Neighborhood nb(kangaroo);
+
+    //kangaroo w/ joey on trampoline
+    if((currentBackgrounds[0] == 32) && int((nb.neighborAt(BOTTOM))) == int(trampoline) && (!nb.hasNeighborAt(LEFT) && !nb.hasNeighborAt(RIGHT) && !nb.hasNeighborAt(TOP)))
     {
         //Create Success Response, end game.
         LOG(":::::: You Passed Level 5 ::::::\nGREAT SUCCESS\n\n\n\n");
@@ -781,4 +832,95 @@ static void learningTask5(){
 
 static void lt5SideCheck(unsigned cube0, unsigned cube1){
 
+    int kangInt = int(kangaroo);
+    int joeyInt = int(joey);
+    int trampInt = int(trampoline);
+
+    int c0 = int(cube0);
+    int c1 = int(cube1);
+
+    if(c0 == kangInt || c1 == kangInt){
+        
+        Neighborhood nb1(kangaroo);
+
+        int bottomKang = int((nb1.neighborAt(BOTTOM)));
+        int leftKang = int((nb1.neighborAt(LEFT)));
+        int rightKang = int((nb1.neighborAt(RIGHT)));
+        int topKang = int((nb1.neighborAt(TOP)));
+
+        //if kang doesn't have joey
+        if(chamColor == 0){
+
+            if((bottomKang == joeyInt || topKang == joeyInt || leftKang == joeyInt || rightKang == joeyInt)
+                && bottomKang != trampInt && topKang != trampInt && leftKang != trampInt && rightKang != trampInt){
+
+                //right
+                //kangjoey
+                currentBackgrounds[0] = 32;
+                //empty
+                currentBackgrounds[1] = 38;
+                //update global state
+                chamColor = 1;
+
+            } else if(nb1.hasNeighborAt(BOTTOM) || nb1.hasNeighborAt(LEFT) || nb1.hasNeighborAt(RIGHT) || nb1.hasNeighborAt(TOP)){
+                
+                //wrong
+                currentBackgrounds[0] = 27;
+            } else {
+                //idle
+                currentBackgrounds[0] = 26;
+            }
+        } else if(chamColor == 1) {
+            if(nb1.hasNeighborAt(LEFT) || nb1.hasNeighborAt(RIGHT) || nb1.hasNeighborAt(TOP)){
+                //wrong
+                currentBackgrounds[0] = 33;
+            } else {
+                //idle
+                currentBackgrounds[0] = 32;
+            }
+        }
+    }
+
+    if(c0 == joeyInt || c1 == joeyInt){
+
+        Neighborhood nb2(joey);
+
+        int bottomJoey = int((nb2.neighborAt(BOTTOM)));
+        int leftJoey = int((nb2.neighborAt(LEFT)));
+        int rightJoey = int((nb2.neighborAt(RIGHT)));
+        int topJoey = int((nb2.neighborAt(TOP)));
+
+        if(chamColor == 0){
+            if(bottomJoey == trampInt || leftJoey == trampInt || rightJoey == trampInt || topJoey == trampInt){
+                //wrong
+                currentBackgrounds[1] = 29;
+            } else{
+                //idle
+                currentBackgrounds[1] = 28;
+            }
+        }
+    }
+
+    if(c0 == trampInt || c1 == trampInt){
+
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
